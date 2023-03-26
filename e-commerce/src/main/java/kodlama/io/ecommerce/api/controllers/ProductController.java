@@ -2,38 +2,45 @@ package kodlama.io.ecommerce.api.controllers;
 
 import jakarta.validation.Valid;
 import kodlama.io.ecommerce.buisness.abstracts.ProductService;
-import kodlama.io.ecommerce.entities.concretes.Product;
+import kodlama.io.ecommerce.entities.Product;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+//controller mvc için direkt sayfa döneceğin zaman
 @RestController
-@RequestMapping("/products")
+//url ile bağlamak için
+@RequestMapping("/api/v1/products")
+@AllArgsConstructor
 public class ProductController {
+    //productmanager da kullanabilirdim ancak interface den alt instancalarada ulaşabiliyorum.
     ProductService service;
+    //put veri güncelleme patch obje güncelleme ie.yeni alan ekleme, çok kullanılmaz
 
-    public ProductController(ProductService service) {
-        this.service = service;
-    }
-
-    @PostMapping ("/create")
-    public boolean create(@Valid @RequestBody Product product){
+     //filtreleme yaparken requestparam gerekir
+    //nesne alacağım zaman requestbody
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public Product create(@Valid @RequestBody Product product){
         return service.create(product);
     }
-    @DeleteMapping("/delete{id}")
-    public boolean delete(@PathVariable(value = "id")int id){
-        return service.delete(id);
+    @DeleteMapping("/{id}")
+
+    public void delete(@PathVariable(value = "id")int id){
+        service.delete(id);
     }
-    @GetMapping("/getAll")
+    //(/getAll) formata uygun değil, gerek de yok get işleminde products dönüyor zaten
+    @GetMapping
     public List<Product> findAll(){
         return service.getAll();
     }
-    @GetMapping("/getById{id}")
+    @GetMapping("/{id}")
     public Product findById(@PathVariable(value = "id")int id){
         return service.getById(id);
     }
-    @PutMapping("/update")
-    public boolean update(@Valid @RequestBody Product product){
-        return service.update(product);
+    @PutMapping("/{id}")
+    public Product update(@Valid @RequestBody Product product,@PathVariable(value = "id")int id){
+        return service.update(product,id);
     }
 }
